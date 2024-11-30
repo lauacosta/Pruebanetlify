@@ -8,20 +8,21 @@ import netlify from "@astrojs/netlify";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [react()],
+	integrations: [react()],
 
-  experimental: {
-      env: {
-          schema: {
-              API_URL: envField.string({
-                  context: "client",
-                  access: "public",
-                  optional: true,
-              }),
-          },
-      },
+	experimental: {
+		env: {
+			schema: {
+				API_URL: envField.string({
+					context: "client",
+					access: "public",
+					optional: true,
+				}),
+			},
+		},
 	},
 
-  output: "server",
-  adapter: netlify(),
+	output: "static",
+	adapter: netlify(),
 });
+
