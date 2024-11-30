@@ -1,58 +1,51 @@
 ---
-import { API_URL } from "astro:env/client";
 import Layout from "../layouts/Layout.astro";
+
 const { searchParams } = Astro.url;
 const escultor_id = searchParams.get("id");
-
-let escultor = null;
-if (escultor_id) {
-    try {
-        const response = await fetch(
-            `${API_URL}/api/escultores/${escultor_id}`,
-        );
-        escultor = await response.json();
-    } catch (error) {
-        console.error("Failed to fetch sculptor:", error);
-    }
-}
 ---
 
 <Layout>
     <section class="hero-section">
+        <section id="up"></section>
+        <section id="down"></section>
+        <section id="left"></section>
+        <section id="right"></section>
         <div class="pantalla-completa">
             <article class="container-votar">
-                <div
-                    id="notificarMail"
-                    class="notificarMail"
-                    style="display: none;"
-                >
+                <div id="notificarMail" class="notificarMail">
+                    <!-- <dotlottie-player src="https://lottie.host/a0796196-ae26-467c-b134-eb8ecefe18fe/eJnBtGitKW.lottie" background="transparent" speed="1" style="width: 300px; height: 200px" loop autoplay></dotlottie-player> -->
+
                     <dotlottie-player
                         src="https://lottie.host/8597446d-f3e2-4f2e-b2fa-d20abacad15f/y6wsc1xjhF.lottie"
                         background="transparent"
                         speed="1"
                         style="width: 200px; height: 200px"
                         loop
-                        autoplay
-                    >
-                    </dotlottie-player>
+                        autoplay></dotlottie-player>
 
-                    <strong>
-                        <p>
-                            Se envió un mail de verificación, revise su correo
-                        </p>
-                    </strong>
+                    <strong
+                        ><p>
+                            Se envío un mail de verificación, revise su correo
+                        </p></strong
+                    >
                     <p>Puede cerrar esta pestaña</p>
                     <p>- o -</p>
-                    <a id="volverAValidar">Volver a enviar el correo</a>
+                    <a id="volverAValidar">Volver a enviar el correo </a>
                 </div>
-
                 <div class="formulario-voto" id="formulario-voto">
-                    <h1 id="nombre-escultor">
-                        {escultor?.nombre_completo || "Escultor"}
-                    </h1>
+                    <h1 id="nombre-escultor"></h1>
                     <p>
                         Para confirmar su voto, ingrese su dirección de correo.
                     </p>
+
+                    <script
+                        is:inline
+                        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+                        async
+                        defer
+                        onload="console.log('Turnstile script loaded')"
+                    ></script>
 
                     <form id="votoForm" method="POST">
                         <input
@@ -70,6 +63,9 @@ if (escultor_id) {
                             data-theme="light"
                         >
                         </div>
+                        <!-- <button type="submit" class="btn-enviar-email" id="btn-votar">
+                    Enviar <i class="material-icons-outlined">&#xe5c8;</i>
+                  </button> -->
 
                         <button
                             type="submit"
@@ -97,131 +93,11 @@ if (escultor_id) {
                         </button>
                     </form>
                 </div>
-
-                {
-                    escultor && (
-                        <img
-                            id="img_escultor"
-                            src={escultor.foto}
-                            alt={escultor.nombre_completo}
-                            title={escultor.nombre_completo}
-                        />
-                    )
-                }
+                <img id="img_escultor" />
+                <!-- TODO: INSERTAR IMAGEN ESCULTOR -->
             </article>
         </div>
     </section>
 </Layout>
 
-<script define:vars={{ escultor_id }}>
-    import { API_URL } from "astro:env/client";
-    import Toastify from "toastify-js";
-
-    const turnstileScript = document.createElement("script");
-    turnstileScript.src =
-        "https://challenges.cloudflare.com/turnstile/v0/api.js";
-    turnstileScript.async = true;
-    turnstileScript.defer = true;
-    document.head.appendChild(turnstileScript);
-
-    async function validar_votante(email) {
-        try {
-            const response = await fetch(
-                `${API_URL}/validar_votante/?correo=${email}&escultor_id=${escultor_id}`,
-                {
-                    method: "GET",
-                    headers: { Accept: "application/json" },
-                },
-            );
-
-            if (response.status === 200) {
-                window.location.href = response.url;
-            } else if (response.status === 201) {
-                notificarEmail();
-                console.log("Envio exitoso");
-            } else {
-                showToast("Error al validar votante", "#f63e3e");
-                console.error("Error al validar votante:", response.status);
-            }
-        } catch (error) {
-            showToast("Error de servidor", "#f63e3e");
-            console.error("Server error:", error);
-        }
-    }
-
-    function showToast(message, backgroundColor) {
-        Toastify({
-            text: message,
-            duration: 3000,
-            gravity: "bottom",
-            position: "right",
-            style: { background: backgroundColor },
-        }).showToast();
-    }
-
-    function notificarEmail() {
-        const containerVotar = document.querySelector(".container-votar");
-        const formularioVoto = document.getElementById("formulario-voto");
-        const imgEscultor = document.getElementById("img_escultor");
-        const notificarMail = document.getElementById("notificarMail");
-
-        if (containerVotar && formularioVoto && imgEscultor && notificarMail) {
-            containerVotar.style.display = "block";
-            containerVotar.style.width = "auto";
-            containerVotar.style.paddingBlock = "32px 46px";
-            containerVotar.style.paddingInline = "32px";
-
-            formularioVoto.style.display = "none";
-            imgEscultor.style.display = "none";
-            notificarMail.style.display = "flex";
-        }
-    }
-
-    const form = document.getElementById("votoForm");
-    const volverAValidar = document.getElementById("volverAValidar");
-
-    if (volverAValidar) {
-        volverAValidar.href = `validar.html?id=${escultor_id}`;
-    }
-
-    if (form) {
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-
-            const emailInput = document.getElementById("email");
-            const button = document.querySelector(".btn-enviar-email");
-            const turnstileResponse = window.turnstile?.getResponse();
-
-            if (!turnstileResponse) {
-                showToast("Por favor, completa el CAPTCHA.", "#f63e3e");
-                return;
-            }
-
-            if (button) button.classList.toggle("active");
-
-            const formData = new FormData(event.target);
-            formData.append("cf-turnstile-response", turnstileResponse);
-
-            try {
-                const response = await fetch(`${API_URL}/verify-captcha/`, {
-                    method: "POST",
-                    body: formData,
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    validar_votante(emailInput.value);
-                } else {
-                    showToast("CAPTCHA inválido.", "#f63e3e");
-                }
-            } catch (error) {
-                console.error("Error al verificar el CAPTCHA:", error);
-                showToast(
-                    "Ocurrió un error. Por favor, inténtalo nuevamente.",
-                    "#f63e3e",
-                );
-            }
-        });
-    }
-</script>
+<script src="../scripts/validar.ts"></script>
