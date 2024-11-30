@@ -1,15 +1,8 @@
 import Toastify from "toastify-js";
 import { API_URL } from "astro:env/client";
 import "toastify-js/src/toastify.css";
+import { getUrlParams } from "./utils";
 
-export function getUrlParams(): Record<string, string> {
-	const params = new URLSearchParams(window.location.search);
-	const searchConfig: Record<string, string> = {};
-	for (const [key, value] of params) {
-		searchConfig[key] = value;
-	}
-	return searchConfig;
-}
 export async function getNombreEscultor(id: string) {
 	const url = `${API_URL}/api/escultores/`;
 	try {

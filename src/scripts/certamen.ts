@@ -1,22 +1,13 @@
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
 import { API_URL } from "astro:env/client";
+import { getUrlParams } from "./utils";
 
-const URL_ESCULTORES = `${API_URL}/api/escultores/`;
 const URL_EVENTOS = `${API_URL}/api/eventos/`;
 const check_puntaje = `${API_URL}/api/check_puntaje`;
 const escultor_por_evento = `${API_URL}/api/escultores_por_evento/`;
 const email = localStorage.getItem("userEmail");
 const overlay = document.querySelector(".overlay") as HTMLDivElement;
-
-export function getUrlParams(): Record<string, string> {
-	const params = new URLSearchParams(window.location.search);
-	const searchConfig: Record<string, string> = {};
-	for (const [key, value] of params) {
-		searchConfig[key] = value;
-	}
-	return searchConfig;
-}
 
 const params = getUrlParams();
 let anio = parseInt(params.anio, 10);
