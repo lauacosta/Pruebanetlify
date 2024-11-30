@@ -1,5 +1,5 @@
 import { API_URL } from "astro:env/client";
-const URL_EVENTOS = `${API_URL}/api/eventos/`;
+const URL_EVENTOS = `${API_URL}/api/eventos_por_anio/`;
 
 export function formatearFecha(fechaString: string) {
 	const [year, month, day] = fechaString.split("-").map(Number);

@@ -5,12 +5,32 @@ import { API_URL } from "astro:env/client";
 const URL_ESCULTORES = `${API_URL}/api/escultores/`;
 const URL_EVENTOS = `${API_URL}/api/eventos/`;
 const check_puntaje = `${API_URL}/api/check_puntaje`;
+const escultor_por_evento = `${API_URL}/api/escultores_por_evento/`;
 const email = localStorage.getItem("userEmail");
 const overlay = document.querySelector(".overlay") as HTMLDivElement;
 
+export function getUrlParams(): Record<string, string> {
+	const params = new URLSearchParams(window.location.search);
+	const searchConfig: Record<string, string> = {};
+	for (const [key, value] of params) {
+		searchConfig[key] = value;
+	}
+	return searchConfig;
+}
+
+const params = getUrlParams();
+let anio = parseInt(params.anio, 10);
+const certamenId: { [key: number]: number } = {
+	2025: 1,
+	2022: 16,
+};
+
 async function inicializar() {
 	try {
-		const res = await fetch(`${URL_EVENTOS}1`);
+		if (!(anio in certamenId)) {
+			anio = 2025;
+		}
+		const res = await fetch(`${URL_EVENTOS}${certamenId[anio]}`);
 		const evento = await res.json();
 
 		const tematica = document.getElementById("tematica") as HTMLSpanElement;
@@ -19,7 +39,7 @@ async function inicializar() {
 			tematica.textContent = evento.tematica.nombre;
 		}
 
-		await loadEscultores(URL_ESCULTORES);
+		await loadEscultores(escultor_por_evento, evento.id);
 	} catch (error) {
 		console.error("Error inicializando la página:", error);
 	}
@@ -114,9 +134,9 @@ function Voto(correo: string, escultor_id: string) {
 
 // ------ Get escultores ------
 
-async function loadEscultores(url: string) {
+async function loadEscultores(url: string, evento_id: number) {
 	try {
-		const res = await fetch(url);
+		const res = await fetch(`${url}?evento_id=${evento_id}`);
 		const escultores = await res.json();
 		const contenedor_escultores = document.querySelector(".grid-escultores");
 		const totalEscultores = document.getElementById(
