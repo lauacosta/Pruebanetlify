@@ -1,6 +1,7 @@
-import { getNombreEscultor, getUrlParams } from "./validar";
+import { getNombreEscultor } from "./validar";
 import Toastify from "toastify-js";
 import "toastify-js/src/toastify.css";
+import { getUrlParams } from "./utils";
 
 const form = document.getElementById("ratingForm") as HTMLFormElement;
 const button = document.querySelector(".btn-votarV2") as HTMLButtonElement;
